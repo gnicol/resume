@@ -12,7 +12,7 @@ https://github.com/gnicol/chronicle/blob/master/library/P4Cms/Cache/Backend/Memc
 
 # Custom Perforce Object Model
 
-When working on Swarm, a code review web app for Perforce, we wanted to avoid running low level Perforce commands and instead model the various items/concepts as objects that are simpler to interact with. This involved some challening mappings as we had to determine which command(s) can be clumped into logical objects. We also had to support a broad range of versions for the Perforce server, making them appear identical to end consumers. A good deal of thought was put into code reuse; note the SingularAbstract and PluralAbstract for the specs. The end result is an easy to use, performant and very well tested (>90% code coverage) interface. I came up with the design and performed all of the initial implementation.
+When working on Swarm, a code review web app for Perforce, we wanted to avoid running low level Perforce commands and instead model the various items/concepts as objects that are simpler to interact with. This involved some challening mappings as we had to determine which command(s) can be clumped into logical objects. We also had to support a broad range of versions for the Perforce server, making them appear identical to end consumers. A good deal of thought was put into code reuse; note the SingularAbstract and PluralAbstract for the specs. The end result is an easy to use, performant and very well tested (~90% code coverage) interface. I came up with the design and performed all of the initial implementation.
 
 The spec models provide a nice example of well formatted code demonstrating good code reuse:
 
