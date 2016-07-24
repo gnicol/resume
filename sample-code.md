@@ -1,6 +1,6 @@
 # sample-code
 
-This page provides an overview for some of my more interesting historic work and deep links into the associated repos.
+This page provides an overview for some of my historic work and deep links into the associated repos.
 
 # Tag based invalidation in Memcached
 
