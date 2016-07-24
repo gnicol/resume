@@ -6,17 +6,13 @@ This page provides a brief overview for some of my more interesting historic wor
 
 When developing the caching layer for a custom CMS, Chronicle, we needed a shared high speed cache. We selected memcached. Unfortunately we also needed to do tagged based invalidation (e.g. invalidate all 'project' related cache entries). Memcached only supported explicit identifier based invalidation. I designed and developed a Zend Framework cache backend to simulate this functionality in a performant manner.
 
-The code includes comments covering the approach in more depth and can be found here:
-
-https://github.com/gnicol/chronicle/blob/master/library/P4Cms/Cache/Backend/MemcachedTagged.php
+The code includes comments covering the approach in more depth and can be [found here](https://github.com/gnicol/chronicle/blob/master/library/P4Cms/Cache/Backend/MemcachedTagged.php).
 
 # Custom Perforce Object Model
 
 When working on Swarm, a code review web app for Perforce, we wanted to avoid running low level Perforce commands and instead model the various items/concepts as objects that are simpler to interact with. This involved some challenging mappings as we had to determine which command(s) can be clumped into logical objects. We also had to support a broad range of versions for the Perforce server, making them appear identical to end consumers. A good deal of thought was put into code reuse; note the SingularAbstract and PluralAbstract for the specs. The end result is an easy to use, performant and very well tested (~90% code coverage) interface. I came up with the design and performed all of the initial implementation.
 
-The spec models provide a nice example of well formatted code demonstrating good code reuse:
-
-https://github.com/gnicol/swarm/tree/master/library/P4/Spec
+The spec models provide a nice example of well formatted code demonstrating good code reuse [see here](https://github.com/gnicol/swarm/tree/master/library/P4/Spec).
 
 # Read/Write Git Repo Replication
 
@@ -30,12 +26,6 @@ To solve this, I designed a custom 'receive-pack' wrapper which listens on a uni
 
 The locking strategy is still a bit broad, locking at the repository level not the reference/branch/tag level. In this instance the remote system had the same constraint so solving the problem in a more fine grained manner was skipped to maintain simplicity.
 
-Internally, this is all documented in notably more detail but regretfully the pages are confidential. You can however view the low level mirroring logic here:
+Internally, this is all documented in notably more detail but regretfully the pages are confidential. You can however view the low level mirroring [logic here](https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/mirror.rb).
 
-https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/mirror.rb
-
-As well as the custom receive-pack script and lock handling here:
-
-https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/bin/swarm-receive-pack
-
-https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/mirror_lock_socket.rb
+As well as the custom [receive-pack script](https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/bin/swarm-receive-pack) and [lock socket logic](https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/mirror_lock_socket.rb).
