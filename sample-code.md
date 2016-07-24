@@ -16,20 +16,20 @@ The spec models provide a nice example of well formatted code demonstrating good
 
 # Bidirectional Git Repo Synchronization
 
-In our extended version of GitLab, we had to adjust the local GitLab repos to act as a write-through proxy to an external system. This was a complex challenge. We needed to fully understand how Git behaves under high concurrency to ensure there was no chance of the repositories desynchronizing. Ultimately, I devised an approach relying primarily on git hooks and a custom 'receive-pack' wrapper.
+In our extended version of GitLab, we had to adjust the local repos to act as a write-through proxy to an external system. This was a complex challenge. We needed to fully understand how Git behaves under high concurrency to ensure there was no chance of the repositories desynchronizing. Ultimately, I devised an approach relying primarily on git hooks and a custom 'receive-pack' wrapper.
 
-At a high level, we we had two problems. Firstly, we wanted to ensure the GitLab copy of the repo was up to date before serving any read or write operations. This half of the problem was fairly straight forward. We simply fetched from the remote repo before servicing the user’s pull/push request.
+At a high level, we had two problems. Firstly, we wanted to ensure the GitLab copy of the repo was up to date before serving any read or write operations. This half of the problem was fairly straight forward. We simply fetched from the remote repo before servicing the user’s pull/push request.
 
 Dealing with write operations was more complex. There was the risk of simultaneous writes to both sides. There was also the challenge of ensuring the two systems, with varying opinions on what was valid, were both ok with the update.
 
-Ultimately we decided to validate but not initially accept the push in GitLab. We then forward the push to the remote git repo which will either fully accept and commit it or reject it. Assuming that goes well, we accept the update locally.
+Ultimately I decided to validate but not initially accept the push in GitLab. We then forward the push to the remote git repo which will either fully accept and commit it or reject it. Assuming that goes well, we accept the update locally.
 
 This ended up up requiring locking to ensure another push didn’t come into GitLab in the middle of the validate/re-push/accept cycle leading to errors. It was key to keep all locks as briefly held as possible, and never held during client network transfer (to avoid denial of service attacks). That presents quite a challenge to do in a manner that cannot deadlock. Ideally, a lock would be taken in the middle of the pre-receive hook and then released at the start of post-receive but these hooks are discrete processes.
 
-To solve this, I designed a custom 'receive-pack' wrapper which listens on a unix socket and can be commanded by the pre/post-receive hooks to take or release a local file system lock. As the receive-pack process lives through the full pre-reive and post-receive life cycle it can hold the lock for the required duration. Given recieve-pack terminates when the push is completed or canceled, we can be assured the lock will not be held indefinitely. 
+To solve this, I designed a 'receive-pack' wrapper which listens on a unix socket and can be commanded by the pre/post-receive hooks to take or release a local file system lock. As the receive-pack process lives through the full pre-reive and post-receive life cycle it can hold the lock for the required duration. Given recieve-pack terminates when the push is completed or canceled, we can be assured the lock will not be held indefinitely. 
 
 The locking strategy is still a bit broad, locking at the repository level not the reference/branch/tag level. In this instance the remote system had the same constraint so solving the problem in a more finely grained manner was skipped to maintain simplicity.
 
-Internally, this is all documented in notably more detail but regretfully the pages are confidential. You can however view the low level mirroring [logic here](https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/mirror.rb).
+Internally, this is all documented in notably more detail but regretfully the pages are confidential. You can however view the low level [mirroring logic here](https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/mirror.rb).
 
 As well as the custom [receive-pack script](https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/bin/swarm-receive-pack) and [lock socket logic](https://github.com/gnicol/gitswarm-shell/blob/release/perforce_swarm/mirror_lock_socket.rb).
